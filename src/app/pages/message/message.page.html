@@ -10,26 +10,31 @@
 <ion-content>
   <ion-grid>
     <ion-row id="item100" *ngFor="let mess of messages">
+        
         <ion-col offset="7" size="8" class="message msg">
           <span>{{mess.thisMessage}}</span>
         </ion-col>
+
     </ion-row>
   </ion-grid>
 </ion-content>
 
-  <ion-footer>
+<ion-footer>
     <ion-toolbar>
       <ion-row align-items-center no-padding>
+        
         <ion-col size="10">
-          <textarea autosize placeholder="Send Message" [(ngModel)]="thisMessage" class="box"></textarea>
+          <textarea autosize  [(ngModel)]="thisMessage" class="box" placeholder="Send Message"></textarea>
         </ion-col>
+        
         <ion-col size="2">
           <ion-button (click)="sendMessage()" class="button" color="success">
-          <ion-icon name="send"></ion-icon>
+              <ion-icon name="send"></ion-icon>
           </ion-button>
         </ion-col>
+
       </ion-row>
     </ion-toolbar>
-  </ion-footer>
+</ion-footer>
 
 

@@ -6,7 +6,6 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./message.page.scss'],
 })
 export class MessagePage implements OnInit {
-
   thisMessage="";
   messages=[];
 
