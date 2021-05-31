@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { AlertController, NavController } from '@ionic/angular';
 import { MessagePageModule } from '../pages/message/message.module';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { ContactServiceService } from '../services/contact-service.service';
+import { Router } from '@angular/router';
+import { Contact } from '../services/contact';
 
 
 
@@ -9,51 +13,62 @@ import { MessagePageModule } from '../pages/message/message.module';
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss']
 })
-export class Tab3Page {
 
-  contName="";
-  contNumber="";
-  contacts=[];
-  constructor(public alertController: AlertController)  {}
 
-  saveC() {
-    let contact = {
-      name: this.contName,
-      number: this.contNumber
 
-    }
-    this.contacts.push(contact);
-    console.log(this.contacts);
-    this.clearField();
+export class Tab3Page implements OnInit{
+  contactForm: FormGroup;
+  contacts: any = [];
 
-  }
-  clearField() {
-    this.contName = "";
-    this.contNumber = "";
-  }
-  
+  constructor(
+    private alertCtrl:AlertController,
+    private contService: ContactServiceService,
+    private router: Router,
+    public fb: FormBuilder
 
-  async delete(i) {
-    const alert = await this.alertController.create({
-      header: 'Confirm!',
-      message: 'Delete this Contact?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-          }
-        }, {
-          text: 'Confirm',
-          handler: () => {
-            this.contacts.splice(i,1);
-          }
-        }
-      ]
-    });
+  ) {}
 
-    await alert.present();
+  ngOnInit(){
+
+    this.fetchContact();
+    let contact = this.contService.getContactList();
+    contact.snapshotChanges().subscribe(res => {
+      this.contacts = [];
+      res.forEach(item => {
+        let a = item.payload.toJSON();
+        a['$key'] = item.key;
+        this.contacts.push(a as Contact);
+      }) 
+    })
   }
 
+  fetchContact() {
+    this.contService.getContactList().valueChanges().subscribe(res => {
+      console.log(res)
+    })
 
+    this.contactForm = this.fb.group({
+      name: [''],
+      mobile: ['']
+    })
 }
+
+  formSubmit() {
+    if (!this.contactForm.valid) {
+      return false;
+    } else {
+      this.contService.createContact(this.contactForm.value).then(res => {
+        console.log(res)
+        this.contactForm.reset();
+      })
+        .catch(error => console.log(error));
+    }
+  }
+  delete(id) {
+    console.log(id)
+    if (window.confirm('Do you want to delete this contact?')) {
+      this.contService.delete(id)
+    }
+  }
+
+  }
